@@ -111,7 +111,7 @@ var CompPlayer = function(level) {
             var cellRandom = availCells[Math.floor(Math.random() * availCells.length)];
             var possMove = new CompMoves(cellRandom);
             var nextState = possMove.applyTo(game.currentState);
-            ui.insertAt(cellRandom, turn);
+            insertAt(cellRandom, turn);
             game.advanceTo(nextState);
         }else if(level == 'master' || level == 'novice'){
             //calculate the score for all the possible branch possibilities
@@ -135,7 +135,7 @@ var CompPlayer = function(level) {
             }
             var nextMove = chosenMove.applyTo(game.currentState);
             // Physically mark the chosen cell 
-            ui.insertAt(chosenMove.markCell, turn);
+            insertAt(chosenMove.markCell, turn);
             game.advanceTo(nextMove);
         }
     }
@@ -201,17 +201,17 @@ var Game = function(CompPlayer) {
                 for (var i = 0; i < array.length; i++) {
                     $('#' + array[i]).addClass('winner');
                 }
-                ui.switchViewTo("won");
+                switchViewTo("won");
             }else if(_state.result === "O-won"){
                 for (var i = 0; i < array.length; i++) {
                     $('#' + array[i]).addClass('winner');
                 }
-                ui.switchViewTo("lost");
+                switchViewTo("lost");
             }else{
-                ui.switchViewTo("draw");
+                switchViewTo("draw");
             }
             
-            ui.markWinCells = function (a, b, c) {
+            markWinCells = function (a, b, c) {
                 var board = $('.cell');
                 $(board[a]).addClass('winner');
                 $(board[b]).addClass('winner');
@@ -220,9 +220,9 @@ var Game = function(CompPlayer) {
         }else{
             //the game is still running
             if(this.currentState.turn === "X") {
-                ui.switchViewTo("human");
+                switchViewTo("human");
             }else{
-                ui.switchViewTo("comp");
+                switchViewTo("comp");
                 //computer turn
                 this.comp.compDifficulty("O");
             }
@@ -288,39 +288,38 @@ $(".cell").each(function() {
             var cell = parseInt($this.attr('id'));
             var nextState = new State(globals.game.currentState);
             nextState.board[cell] = "X";
-            ui.insertAt(cell, "X");
+            insertAt(cell, "X");
             nextState.advanceTurn();
             globals.game.advanceTo(nextState);
         }
      });
 });
 
-var ui = {};
 //holds the state of the intial controls visibility
-ui.intialControlsVisible = true;
+intialControlsVisible = true;
 //holds the current visible view
-ui.currentView = "";
+currentView = "";
 /*
  * starts the flickering effect of the robot image
  */
-ui.startRobotFlickering = function() {
-    ui.robotFlickeringHandle = setInterval(function() {
+startRobotFlickering = function() {
+    robotFlickeringHandle = setInterval(function() {
         $("#robot").toggleClass('robot');
     }, 500);
 };
 
 
 // Switches the notifications at the bottom of the page
-ui.switchViewTo = function(turn) {
+switchViewTo = function(turn) {
     //helper function for async calling
     function _switch(_turn) {
-        ui.currentView = "#" + _turn;
-        $(ui.currentView).fadeIn("fast");
-        ui.startRobotFlickering();
+        currentView = "#" + _turn;
+        $(currentView).fadeIn("fast");
+        startRobotFlickering();
     }
-    if(ui.intialControlsVisible){
+    if(intialControlsVisible){
         //if the game is just starting
-        ui.intialControlsVisible = false;
+        intialControlsVisible = false;
         $('.intial').fadeOut({
             duration : "slow",
             done : function() {
@@ -329,7 +328,7 @@ ui.switchViewTo = function(turn) {
         });
     }else{
         //if the game is in an intermediate state
-        $(ui.currentView).fadeOut({
+        $(currentView).fadeOut({
             duration: "fast",
             done: function() {
                 _switch(turn);
@@ -339,7 +338,7 @@ ui.switchViewTo = function(turn) {
 };
 
 // actually marks the board with either an "X" or "O"
-ui.insertAt = function(indx, symbol) {
+insertAt = function(indx, symbol) {
     var board = $('.cell');
     var targetCell = $(board[indx]);
     if(!targetCell.hasClass('occupied')) {
